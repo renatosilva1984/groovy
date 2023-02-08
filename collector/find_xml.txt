@@ -1,0 +1,45 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+//import java.util.HashMap;
+//import groovy.xml.*;
+//import java.time.LocalDateTime;
+//import groovy.time.TimeCategory;
+//import java.util.TimeZone;
+
+def Message processData(Message message) {
+    
+    def filter = "";
+    def xml = new XmlParser().parseText(message.getBody(String));
+    
+    //default 1
+    String sHora = '1'
+    
+    it = xml.ZZ1_CONSTANTEType.findAll{ Item -> Item.NAME.text() == "MULTI_FO_FREQ" }
+    it.each {
+            sHora = it.LOW.text();
+    }
+    
+    int iHora = sHora.toInteger();
+
+    //Horas em milisegundos para subtrair da data atual
+    final Long milliseconds = iHora * 60 * 60 * 1000; // milliseconds
+
+    tz = TimeZone.getTimeZone("America/Sao_Paulo");         
+    def actualDateTime = new Date(new Date( ).toInstant().toEpochMilli() - milliseconds).format("yyyy-MM-dd'T'HH:mm:ss", timezone=tz);
+    filter = filter + " and datetime_chscs ge datetime'" + actualDateTime + "'";    
+
+    //MULTI_OD_RETIRA
+    it = xml.ZZ1_CONSTANTEType.findAll{ Item -> Item.NAME.text() == "MULTI_OD_RETIRA" }
+    def retira = "<retira>";
+    it.each {
+            def (transpRetira, cnpjRetira) = it.LOW.text().tokenize( ';' );
+            retira = retira + "<item><transpRetira>" + transpRetira + "</transpRetira><cnpjRetira>" + cnpjRetira + "</cnpjRetira></item>";
+    }
+    
+    retira = retira + "</retira>";
+    message.setProperty("retira", retira);
+       
+    
+    message.setProperty("filter", filter);
+   
+    return message;
+}

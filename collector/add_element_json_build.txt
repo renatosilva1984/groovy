@@ -1,0 +1,33 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.json.*;
+
+def Message processData(Message message) {    
+    //Body 
+    def body = message.getBody(String.class);    
+   
+    def jsonSlurper = new JsonSlurper()
+    def list = jsonSlurper.parseText(body)
+    def json = JsonOutput.toJson(list) 
+    def mapJson
+    def jsonTOTAL
+    def builder = new JsonBuilder()
+
+    jsonRFC = JsonOutput.toJson(list)
+   
+     mapJson = builder{
+            "Type" null  
+     }    
+  
+    if ( list?.Z?.ET_BAPIRET?.isEmpty() ){
+
+    //    list.Z.remove('ET_BAPIRET')   
+        list.Z.ET_BAPIRET = mapJson
+
+    jsonTOTAL = JsonOutput.toJson(list)
+    message.setBody(JsonOutput.prettyPrint(jsonTOTAL))
+    
+    }
+
+     return message;
+}

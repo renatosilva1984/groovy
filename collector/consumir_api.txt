@@ -1,0 +1,35 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import org.apache.camel.*;
+import groovy.json.JsonSlurper;
+import groovy.json.*;
+
+def Message processData(Message message) {
+def body = message.getBody(java.lang.String) as String;
+def messageLog = messageLogFactory.getMessageLog(message);
+
+// Request
+def get = new URL("https://silimedcpihom.it-cpi008-rt.cfapps.br10.hana.ondemand.com/http/bill").openConnection() as HttpURLConnection;
+
+get.setRequestMethod('POST');
+get.setRequestProperty("Accept", 'application/json');
+get.setRequestProperty("Content-Type", 'application/json');
+
+get.setRequestProperty('Authorization','Basic' + 'allan.camargo@enginebr.com.br:HBa-p4W4k72kc!7'.bytes.encodeBase64().toString());
+
+get.connect();
+
+ def getRC = get.getResponseCode();
+ 
+
+//     println(post.getInputStream().getText());
+     
+def Response =  get.getInputStream()
+ 
+ 
+ messageLog.setStringProperty( "ResponseSillimed:" ,  "Status HTTP" +  getRC.toString() );
+  messageLog.setStringProperty( "ResponseSillimed2:" ,  "Status HTTP" +  Response.toString() );
+
+message.setBody(getRC);
+return message;
+}

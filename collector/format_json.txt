@@ -1,0 +1,400 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.json.*;
+
+def Message processData(Message message) {
+    
+    message.setHeader("Content-Type", "application/json")
+    
+    def properties = message.getProperties()
+    String sfsfReturnJson = properties.get("sfsfReturnJson").toString()
+    
+    def jsonParser = new JsonSlurper()
+    def jsonObject = jsonParser.parseText(sfsfReturnJson)
+    
+    String cust_Empregador = properties.get("cust_Empregador").toString()
+
+    def cpf = ""
+
+    try {
+
+        cpf = jsonObject.PerPerson.PerPerson.nationalIdNav.PerNationalId.nationalId
+
+    } catch (Exception cpfEx){
+
+        message.setProperty("cpfEx", cpfEx)
+        
+    }
+
+    def nome = ""
+
+    try {
+
+        nome = jsonObject.PerPerson.PerPerson.personalInfoNav.PerPersonal.displayName
+
+    } catch (Exception nomeEx){
+
+        message.setProperty("nomeEx", nomeEx)
+
+    }
+
+    
+    def rg = "" 
+    
+    try {
+        
+        if(jsonObject.PerPerson.PerPerson.employmentNav?.EmpEmployment.getClass() == ArrayList){
+            rg = jsonObject.PerPerson.PerPerson.employmentNav?.EmpEmployment.find{e -> (e.empWorkPermitNav != "") ? e.empWorkPermitNav.EmpWorkPermit.customString1 : ""}.empWorkPermitNav.EmpWorkPermit.customString1      
+                   
+        } else {
+            rg = jsonObject.PerPerson.PerPerson.employmentNav?.EmpEmployment?.empWorkPermitNav?.EmpWorkPermit?.customString1
+        }    
+    } catch (Exception rgEx){
+        
+        message.setProperty("rgEx", rgEx)
+        
+    }
+
+    
+    def emailPrincipal = ""
+    
+    try {
+        
+        emailPrincipal = jsonObject.PerPerson.PerPerson.userAccountNav.UserAccount.email
+        
+    } catch(Exception emailPrincipalEx){
+        
+        message.setProperty("emailPrincipalEx", emailPrincipalEx)
+        
+    }
+    
+    def matricula = ""
+    
+    try {
+        
+        if(jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.getClass() == ArrayList){
+            matricula = jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment[1].jobInfoNav.EmpJob.userId
+        } else {
+            matricula = jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.jobInfoNav.EmpJob.userId
+        }
+    } catch(Exception matriculaEx){
+        
+        message.setProperty("matriculaEx", matriculaEx)
+    }
+    
+    def salario = ""
+    
+    try {
+        
+        if(jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.getClass() == ArrayList){
+            salario = jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment[0].compInfoNav.EmpCompensation.empPayCompRecurringNav.EmpPayCompRecurring.paycompvalue
+        } else {
+            salario = jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.compInfoNav.EmpCompensation.empPayCompRecurringNav.EmpPayCompRecurring.paycompvalue
+        }
+    } catch(Exception salarioEx){
+        message.setProperty("salarioEx", salarioEx)
+    }
+    
+    def emailSecundario = ""
+    
+    try {
+        emailSecundario = jsonObject.PerPerson.PerPerson.emailNav.PerEmail.emailAddress
+        
+    } catch(Exception emailSecundarioEx){
+        
+        message.setProperty("emailSecundarioEx", emailSecundarioEx)
+        
+    }    
+    
+    def cep = ""
+    def endereco = ""
+    def bairro = ""
+    def cidade = ""
+    def estado = ""
+    def numero = ""
+    def complemento = ""
+    
+    try {
+        cep           = jsonObject.PerPerson.PerPerson.homeAddressNavDEFLT.PerAddressDEFLT.zipCode
+        endereco      = jsonObject.PerPerson.PerPerson.homeAddressNavDEFLT.PerAddressDEFLT.address1
+        bairro        = jsonObject.PerPerson.PerPerson.homeAddressNavDEFLT.PerAddressDEFLT.address4
+        cidade        = jsonObject.PerPerson.PerPerson.homeAddressNavDEFLT.PerAddressDEFLT.city
+        estado        = jsonObject.PerPerson.PerPerson.homeAddressNavDEFLT.PerAddressDEFLT.stateNav.PicklistOption.externalCode
+        numero        = jsonObject.PerPerson.PerPerson.homeAddressNavDEFLT.PerAddressDEFLT.address2
+        complemento   = jsonObject.PerPerson.PerPerson.homeAddressNavDEFLT.PerAddressDEFLT.address3
+
+    } catch (Exception homeAddressNavDEFLTEx){
+        
+        message.setProperty("homeAddressNavDEFLTEx", homeAddressNavDEFLTEx)
+        
+    }  
+
+    def telefoneCelular  = ""
+    def countryCodeCelular = ""
+    def areaCodeCelular = ""
+
+    try {
+
+    if(jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone.getClass() == ArrayList){
+        telefoneCelular = jsonObject.PerPerson.PerPerson?.phoneNav?.PerPhone.find{e -> e.phoneTypeNav.PicklistOption.externalCode == "C"}.phoneNumber      
+        countryCodeCelular = jsonObject.PerPerson.PerPerson?.phoneNav?.PerPhone.find{e -> e.phoneTypeNav.PicklistOption.externalCode == "C"}.countryCode      
+        areaCodeCelular = jsonObject.PerPerson.PerPerson?.phoneNav?.PerPhone.find{e -> e.phoneTypeNav.PicklistOption.externalCode == "C"}.areaCode      
+               
+    } else if(jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.phoneTypeNav?.PicklistOption?.externalCode == "C") {
+        telefoneCelular = jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.phoneNumber
+        countryCodeCelular = jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.countryCode
+        areaCodeCelular = jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.areaCode
+    }
+    } catch (Exception telefoneCelularEx){
+        message.setProperty("telefoneCelularEx", telefoneCelularEx)
+    }
+
+    def telefoneResidencial  = ""
+    def countryCodeResidencial = ""
+    def areaCodeResidencial = ""
+
+    try {
+
+    if(jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone.getClass() == ArrayList){
+        telefoneResidencial = jsonObject.PerPerson.PerPerson?.phoneNav?.PerPhone.find{e -> e.phoneTypeNav.PicklistOption.externalCode == "H"}.phoneNumber      
+        countryCodeResidencial = jsonObject.PerPerson.PerPerson?.phoneNav?.PerPhone.find{e -> e.phoneTypeNav.PicklistOption.externalCode == "H"}.countryCode      
+        areaCodeResidencial = jsonObject.PerPerson.PerPerson?.phoneNav?.PerPhone.find{e -> e.phoneTypeNav.PicklistOption.externalCode == "H"}.areaCode      
+               
+    } else if(jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.phoneTypeNav?.PicklistOption?.externalCode == "H") {
+        telefoneResidencial = jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.phoneNumber
+        countryCodeResidencial = jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.countryCode
+        areaCodeResidencial = jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.areaCode
+    }
+    } catch (Exception telefoneResidencialEx){
+        message.setProperty("telefoneResidencialEx", telefoneResidencialEx)
+    }
+
+    def telefoneComercial  = ""
+    def countryCodeComercial = ""
+    def areaCodeComercial = ""
+
+    try {
+
+    if(jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone.getClass() == ArrayList){
+        telefoneComercial = jsonObject.PerPerson.PerPerson?.phoneNav?.PerPhone.find{e -> e.phoneTypeNav.PicklistOption.externalCode == "B"}.phoneNumber      
+        countryCodeComercial = jsonObject.PerPerson.PerPerson?.phoneNav?.PerPhone.find{e -> e.phoneTypeNav.PicklistOption.externalCode == "B"}.countryCode      
+        areaCodeComercial = jsonObject.PerPerson.PerPerson?.phoneNav?.PerPhone.find{e -> e.phoneTypeNav.PicklistOption.externalCode == "B"}.areaCode      
+               
+    } else if(jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.phoneTypeNav?.PicklistOption?.externalCode == "B") {
+        telefoneComercial = jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.phoneNumber
+        countryCodeComercial = jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.countryCode
+        areaCodeComercial = jsonObject.PerPerson.PerPerson.phoneNav?.PerPhone?.areaCode
+    }
+    } catch (Exception telefoneComercialEx){
+        message.setProperty("telefoneComercialEx", telefoneComercialEx)
+    }
+
+    def orgaoExpedidor = ""
+
+    try{
+
+        if(jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.getClass() == ArrayList){
+            orgaoExpedidor = jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.find{e -> (e.empWorkPermitNav != "") ? e.empWorkPermitNav.EmpWorkPermit.customString2 : ""}.empWorkPermitNav.EmpWorkPermit.customString2
+        } else {
+            
+            orgaoExpedidor =  jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.empWorkPermitNav.EmpWorkPermit.customString2
+        }
+
+    } catch (Exception orgaoExpedidorEx){
+
+        message.setProperty("orgaoExpedidorEx", orgaoExpedidorEx)
+    }
+
+    def ufExpedidor = ""
+
+    try {
+
+        ufExpedidor = jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.empWorkPermitNav.EmpWorkPermit.customLong1Nav.PicklistOption.externalCode
+
+    } catch (Exception ufExpedidorEx){
+
+        message.setProperty("ufExpedidorEX", ufExpedidorEx)
+
+    }
+
+    def dataExpedicao = ""
+
+    try {
+        
+        if(jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.getClass() == ArrayList){
+            dataExpedicao = jsonObject.PerPerson.PerPerson.employmentNav?.EmpEmployment.find{e -> (e.empWorkPermitNav != "")? e.empWorkPermitNav.EmpWorkPermit.customDate1 : ""}.empWorkPermitNav.EmpWorkPermit.customDate1
+        } else {
+            
+            dataExpedicao = jsonObject.PerPerson.PerPerson.employmentNav.EmpEmployment.empWorkPermitNav.EmpWorkPermit.customDate1
+            
+        }
+
+
+    } catch (Exception dataExpedicaoEx){
+
+        message.setProperty("dataExpedicaoEx", dataExpedicaoEx)
+
+    }
+
+    def nomeMae = ""
+
+    try {
+
+        nomeMae = jsonObject.PerPerson.PerPerson.personalInfoNav.PerPersonal.localNavBRA.PerGlobalInfoBRA.customString4
+
+    } catch (Exception nomeMaeEx){
+
+        message.setProperty("nomeMaeEx", nomeMaeEx)
+
+    } 
+
+    def nomePai = ""
+
+    try {
+
+        nomePai = jsonObject.PerPerson.PerPerson.personalInfoNav.PerPersonal.localNavBRA.PerGlobalInfoBRA.customString5
+
+    } catch (Exception nomePaiEx){
+
+        message.setProperty("nomePaiEx", nomePaiEx)
+
+    }       
+    
+    def estadoCivil = ""
+
+    try {
+
+        estadoCivil =  jsonObject.PerPerson.PerPerson.personalInfoNav.PerPersonal.maritalStatusNav.PicklistOption.localeLabel
+
+    } catch (Exception estadoCivilEx){
+
+        message.setProperty("estadoCivilEx", estadoCivilEx)
+
+    }
+
+    def nomeConjuge = ""
+
+    try {
+
+       if(jsonObject.PerPerson.PerPerson.personRerlationshipNav.PerPersonRelationship.getClass() == ArrayList){
+
+           nomeConjuge = jsonObject.PerPerson.PerPerson.personRerlationshipNav.PerPersonRelationship.find{ e -> e.relationshipTypeNav.PicklistOption.externalCode == "1"}.firstName + " " + jsonObject.PerPerson.PerPerson.personRerlationshipNav.PerPersonRelationship.find{ e -> e.relationshipTypeNav.PicklistOption.externalCode == "1"}.lastName
+                         
+       } else if(jsonObject.PerPerson.PerPerson.personRerlationshipNav.PerPersonRelationship.relationshipTypeNav.PicklistOption.externalCode == "1"){
+
+           nomeConjuge = jsonObject.PerPerson.PerPerson.personRerlationshipNav.PerPersonRelationship.firstName + " " + jsonObject.PerPerson.PerPerson.personRerlationshipNav.PerPersonRelationship.lastName
+
+       }
+
+    } catch (Exception nomeConjugeEx){
+
+        message.setProperty("nomeConjugeEx", nomeConjugeEx)
+
+    }
+
+    def sexo = ""
+
+    try {
+
+        sexo = jsonObject.PerPerson.PerPerson.personalInfoNav.PerPersonal.gender
+
+    } catch (Exception sexoEx){
+
+        message.setProperty("sexoEx", sexoEx)
+
+    }
+
+    def naturalidade = ""
+
+    try{
+
+        naturalidade = jsonObject.PerPerson.PerPerson?.countryOfBirth
+
+    } catch (Exception naturalidadeEx){
+
+        message.setProperty("naturalidadeEx", naturalidadeEx)
+
+    }
+
+    def dataNascimento = ""
+
+    try{
+
+        dataNascimento = jsonObject.PerPerson.PerPerson.dateOfBirth
+
+    } catch (Exception dataNascimentoEx){
+
+        message.setProperty("dataNascimentoEx", dataNascimentoEx)
+
+    }
+
+    
+    def json = JsonOutput.toJson(
+        Cpf                 : cpf,
+		Matricula           : matricula.toInteger(),
+		Empregador          : cust_Empregador.toInteger(),
+		Nome                : nome,
+		DataNascimento      : dataNascimento,
+		EmailPrincipal      : emailPrincipal,
+//		MatriculaAlfaNumerico: "string",
+		Sexo                : sexo,
+		RG                  : rg,
+		EmailSecundario     : emailSecundario,
+		TelefoneResidencial : "$countryCodeResidencial $areaCodeResidencial $telefoneResidencial",
+		TelefoneComercial   : "$countryCodeComercial $areaCodeComercial $telefoneComercial",
+		Cep                 : cep,
+		Endereco            : endereco,
+		Bairro              : bairro,
+		Cidade              : cidade,
+		Estado              : estado,
+		Salario             : salario.toDouble(),
+		Numero              : numero,
+		Complemento         : complemento,
+		TelefoneCelular     : "$countryCodeCelular $areaCodeCelular $telefoneCelular",
+		Naturalidade        : naturalidade,
+		Nacionalidade: "string",
+		OrgaoExpedidor      : orgaoExpedidor,
+		//UFExpedidor         : ufExpedidor,
+		UFExpedidor         : "",
+		DataExpedicao       : dataExpedicao,
+		NomeMae             : nomeMae,
+		NomePai             : nomePai,
+		//EstadoCivil         : estadoCivil,
+		EstadoCivil         : 0,
+		NomeConjuge         : nomeConjuge          
+        )
+        
+    def array = []
+    
+    array.push(json)
+
+    def arrayObj = jsonParser.parseText(array.toString())
+
+    def jsonSinqia = JsonOutput.toJson(
+        CodigoEmpregador : cust_Empregador,
+        Lista : arrayObj 
+        )
+        
+    def jsonMensagens = JsonOutput.toJson(
+        codigo: "string",
+        mensagem: "string",
+        campo: "string",
+        valor: "string",
+        )
+        
+    def arrayMensagens = []
+    arrayMensagens.push(jsonMensagens)
+    
+    def arrayMensagensObj =  jsonParser.parseText(arrayMensagens.toString())
+        
+    def jsonSinqiaObj = jsonParser.parseText(jsonSinqia)
+    
+    jsonSinqiaObj.Lista[0].Situacao = 1
+    jsonSinqiaObj.Lista[0].Mensagens = arrayMensagensObj
+    
+    message.setBody(JsonOutput.toJson(jsonSinqiaObj))
+    
+    message.setProperty("jsonSinqia", JsonOutput.toJson(jsonSinqiaObj))
+    
+    return message;
+}

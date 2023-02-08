@@ -1,0 +1,45 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.json.*;
+
+def getBodyAsMap(Message message) {
+    String body = message.getBody(String)
+    assert body
+
+    def jsonSlurper = new JsonSlurper()
+    def mBody = jsonSlurper.parseText(body)
+
+    return mBody
+}
+
+def String toJSON(Map map, Boolean pretty = true) {
+    String json = JsonOutput.toJson(map)
+
+    if (!pretty) return json
+
+    String prettyJson = JsonOutput.prettyPrint(json)
+    return prettyJson
+}
+
+def Message processData(Message message){
+
+    Map body = getBodyAsMap(message)
+
+    Map groupedBody = body.row.groupBy{it.INDEX}
+
+    Map newBody = [
+        "groups": groupedBody.values().collect{
+            return [
+                row: it
+            ]
+        }
+    ]
+
+    String jsonBody = toJSON(newBody)
+
+    message.setBody(jsonBody)
+    
+    message.setProperty("jsonIn", jsonBody)
+  
+   return message;
+}

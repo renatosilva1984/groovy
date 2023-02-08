@@ -1,0 +1,19 @@
+import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.xml.MarkupBuilder
+
+Message processData(Message message) {
+    // Access message body and properties
+    Reader reader = message.getBody(Reader)
+ //   Map properties = message.getProperties()
+
+    // Define XML parser and builder
+    def FecharCargaResponse = new XmlSlurper().parse(reader)
+    def CodigoMensagem = ''
+    def Mensagem = ''    
+
+    message.setProperty("CodigoMensagem", FecharCargaResponse.FecharCargaResult.CodigoMensagem.text() );
+    message.setProperty("Mensagem", FecharCargaResponse.FecharCargaResult.Mensagem.text() );
+    // Generate output
+    return message
+}
+

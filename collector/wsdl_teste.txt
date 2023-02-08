@@ -1,0 +1,907 @@
+<wsdl:definitions targetNamespace="urn:sap-com:document:sap:rfc:functions"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsoap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+                  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+                  xmlns:tns="urn:sap-com:document:sap:rfc:functions">
+	<wsdl:documentation>
+		<sidl:sidl xmlns:sidl="http://www.sap.com/2007/03/sidl"/>
+	</wsdl:documentation>
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="qualified"
+		            targetNamespace="urn:sap-com:document:sap:rfc:functions">
+			<xsd:simpleType name="byte16">
+				<xsd:restriction base="xsd:base64Binary">
+					<xsd:maxLength value="16"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char1">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="1"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char10">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="10"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char12">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="12"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char18">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="18"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char2">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="2"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char20">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="20"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char220">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="220"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char24">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="24"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char255">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="255"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char3">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char30">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="30"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char32">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="32"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char35">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="35"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char4">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="4"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char40">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="40"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char50">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="50"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char6">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="6"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char61">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="61"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char70">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="70"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="char72">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="72"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="clnt3">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="date10">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="10"/>
+					<xsd:pattern value="\d\d\d\d-\d\d-\d\d"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="decimal15.0">
+				<xsd:restriction base="xsd:decimal">
+					<xsd:totalDigits value="15"/>
+					<xsd:fractionDigits value="0"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="decimal21.7">
+				<xsd:restriction base="xsd:decimal">
+					<xsd:totalDigits value="21"/>
+					<xsd:fractionDigits value="7"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric1">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="1"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric10">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="10"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric13">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="13"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric14">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="14"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric18">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="18"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric2">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="2"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric20">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="20"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric3">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="3"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric4">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="4"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="numeric6">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="6"/>
+					<xsd:pattern value="\d*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="quantum13.3">
+				<xsd:restriction base="xsd:decimal">
+					<xsd:totalDigits value="13"/>
+					<xsd:fractionDigits value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="quantum31.14">
+				<xsd:restriction base="xsd:decimal">
+					<xsd:totalDigits value="31"/>
+					<xsd:fractionDigits value="14"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="unit3">
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:complexType name="_-LIME_-PI_S_GUID_ITEM">
+				<xsd:sequence>
+					<xsd:element name="GUID_DOC"
+					             type="tns:byte16"/>
+					<xsd:element name="ITEM_NO"
+					             type="tns:numeric6"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_ITEM_READ">
+				<xsd:sequence>
+					<xsd:element name="DOC_NUMBER"
+					             type="tns:numeric20"/>
+					<xsd:element name="DOC_YEAR"
+					             type="tns:numeric4"/>
+					<xsd:element name="ITEM_NO"
+					             type="tns:numeric6"/>
+					<xsd:element name="DOC_STATUS"
+					             type="tns:char4"/>
+					<xsd:element name="DOC_TYPE"
+					             type="tns:char2"/>
+					<xsd:element name="IPO_NUMBER"
+					             type="tns:numeric20"/>
+					<xsd:element name="IPO_YEAR"
+					             type="tns:numeric4"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_HEAD_ATTRIBUTES">
+				<xsd:sequence>
+					<xsd:element name="PROCESS_TYPE"
+					             type="tns:char4"/>
+					<xsd:element name="LGNUM"
+					             type="tns:char4"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="BAPIRET2">
+				<xsd:sequence>
+					<xsd:element name="TYPE"
+					             type="tns:char1"/>
+					<xsd:element name="ID"
+					             type="tns:char20"/>
+					<xsd:element name="NUMBER"
+					             type="tns:numeric3"/>
+					<xsd:element name="MESSAGE"
+					             type="tns:char220"/>
+					<xsd:element name="LOG_NO"
+					             type="tns:char20"/>
+					<xsd:element name="LOG_MSG_NO"
+					             type="tns:numeric6"/>
+					<xsd:element name="MESSAGE_V1"
+					             type="tns:char50"/>
+					<xsd:element name="MESSAGE_V2"
+					             type="tns:char50"/>
+					<xsd:element name="MESSAGE_V3"
+					             type="tns:char50"/>
+					<xsd:element name="MESSAGE_V4"
+					             type="tns:char50"/>
+					<xsd:element name="PARAMETER"
+					             type="tns:char32"/>
+					<xsd:element name="ROW"
+					             type="xsd:int"/>
+					<xsd:element name="FIELD"
+					             type="tns:char30"/>
+					<xsd:element name="SYSTEM"
+					             type="tns:char10"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_ITEM_READ_GET_SINGLE">
+				<xsd:sequence>
+					<xsd:element name="DATA"
+					             type="tns:_-LIME_-PI_ITEM_POS"/>
+					<xsd:element name="T_PARAM"
+					             type="tns:_-LIME_-T_PARAM"/>
+					<xsd:element name="T_LOGITEM"
+					             type="tns:_-LIME_-PI_T_DOC_LOGITEM"/>
+					<xsd:element name="T_PROP"
+					             type="tns:_-LIME_-PI_T_ITEM_SUB_READ_GET_S"/>
+					<xsd:element name="T_BOOK"
+					             type="tns:_-LIME_-PI_T_ITEM_SUB_READ_GET_S"/>
+					<xsd:element name="T_EXIST"
+					             type="tns:_-LIME_-PI_T_ITEM_SUB_READ_GET_S"/>
+					<xsd:element name="T_COUNT_RESULT"
+					             type="tns:_-LIME_-PI_T_ITEM_SUB_READ_GET_S"/>
+					<xsd:element name="T_DIFFERENCE"
+					             type="tns:_-LIME_-PI_T_ITEM_SUB_READ_GET_S"/>
+					<xsd:element name="LOGHEAD"
+					             type="tns:_-LIME_-PI_S_LOGHEAD"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_ITEM_SUB_READ_GET_SIN">
+				<xsd:sequence>
+					<xsd:element name="DATA"
+					             type="tns:_-LIME_-PI_ITEM_POS_SUB"/>
+					<xsd:element name="T_QUAN"
+					             type="tns:_-LIME_-PI_T_QUAN"/>
+					<xsd:element name="T_USID"
+					             type="tns:_-LIME_-PI_T_USID_BIZ"/>
+					<xsd:element name="T_PARAM"
+					             type="tns:_-LIME_-T_PARAM"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_QUAN">
+				<xsd:sequence>
+					<xsd:element name="QAN_DOC_STATUS"
+					             type="tns:char4"/>
+					<xsd:element name="QUAN_SEQ"
+					             type="xsd:int"/>
+					<xsd:element name="QUANTITY"
+					             type="tns:quantum31.14"/>
+					<xsd:element name="UNIT"
+					             type="tns:unit3"/>
+					<xsd:element name="ENTERED_QUANTITY"
+					             type="tns:quantum31.14"/>
+					<xsd:element name="ENTERED_UNIT"
+					             type="tns:unit3"/>
+					<xsd:element name="IND_ZERO_COUNT"
+					             type="tns:char1"/>
+					<xsd:element name="IND_NOT_COUNT"
+					             type="tns:char1"/>
+					<xsd:element name="BOOK_QUANTITY"
+					             type="tns:quantum13.3"/>
+					<xsd:element name="BOOK_QUAN_UNIT"
+					             type="tns:unit3"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_ITEM_POS_SUB">
+				<xsd:sequence>
+					<xsd:element name="ITEM_TYPE"
+					             type="tns:char2"/>
+					<xsd:element name="LINE_IDX"
+					             type="xsd:int"/>
+					<xsd:element name="LVL"
+					             type="xsd:int"/>
+					<xsd:element name="DOC_TYPE"
+					             type="tns:char2"/>
+					<xsd:element name="DOC_STATUS"
+					             type="tns:char4"/>
+					<xsd:element name="COUNT_DATE"
+					             type="tns:decimal21.7"/>
+					<xsd:element name="COUNT_USER"
+					             type="tns:char12"/>
+					<xsd:element name="CREATE_DATE"
+					             type="tns:decimal21.7"/>
+					<xsd:element name="POST_DATE"
+					             type="tns:decimal21.7"/>
+					<xsd:element name="DIF_DIRECTION"
+					             type="tns:char1"/>
+					<xsd:element name="GUID_ITEM"
+					             type="tns:byte16"/>
+					<xsd:element name="TYPE_ITEM"
+					             type="tns:char1"/>
+					<xsd:element name="IDX_ITEM"
+					             type="tns:char3"/>
+					<xsd:element name="GUID_PARENT"
+					             type="tns:byte16"/>
+					<xsd:element name="TYPE_PARENT"
+					             type="tns:char1"/>
+					<xsd:element name="IDX_PARENT"
+					             type="tns:char3"/>
+					<xsd:element name="STOCK_ITEM"
+					             type="tns:_-LIME_-STOCK_BIZ"/>
+					<xsd:element name="HU_ITEM"
+					             type="tns:_-LIME_-HU_BIZ"/>
+					<xsd:element name="LOC_ITEM"
+					             type="tns:_-LIME_-LOC_BIZ"/>
+					<xsd:element name="LOC_PARENT"
+					             type="tns:_-LIME_-LOC_BIZ"/>
+					<xsd:element name="HU_PARENT"
+					             type="tns:_-LIME_-HU_BIZ"/>
+					<xsd:element name="PI_AREA"
+					             type="tns:byte16"/>
+					<xsd:element name="BLOCK_IND"
+					             type="tns:char1"/>
+					<xsd:element name="FREEZE_IND"
+					             type="tns:char1"/>
+					<xsd:element name="TIME_BOOK_QUAN_D"
+					             type="tns:decimal21.7"/>
+					<xsd:element name="VSI_ITEM"
+					             type="tns:char1"/>
+					<xsd:element name="PRIORITY"
+					             type="tns:numeric1"/>
+					<xsd:element name="ITEM_NEW_IND"
+					             type="tns:char1"/>
+					<xsd:element name="ORDER_SEQ"
+					             type="xsd:float"/>
+					<xsd:element name="LINE_GUID"
+					             type="tns:byte16"/>
+					<xsd:element name="IND_HU_ITEM_COMP"
+					             type="tns:char1"/>
+					<xsd:element name="IND_LOC_PAR_COMP"
+					             type="tns:char1"/>
+					<xsd:element name="IND_LOC_PAR_EMPT"
+					             type="tns:char1"/>
+					<xsd:element name="IND_HU_ITEM_EMPT"
+					             type="tns:char1"/>
+					<xsd:element name="IND_HU_ITEM_NOEX"
+					             type="tns:char1"/>
+					<xsd:element name="IND_ITEM_CHECKED"
+					             type="tns:char1"/>
+					<xsd:element name="IND_ADD_IT_CHECK"
+					             type="tns:char1"/>
+					<xsd:element name="REASON"
+					             type="tns:char4"/>
+					<xsd:element name="HOLD_INCLUDE"
+					             type="tns:char1"/>
+					<xsd:element name="INSPTYP"
+					             type="tns:char1"/>
+					<xsd:element name="INSPID"
+					             type="tns:byte16"/>
+					<xsd:element name="IDPLATE"
+					             type="tns:char20"/>
+					<xsd:element name="QDOCCAT"
+					             type="tns:char3"/>
+					<xsd:element name="QDOCID"
+					             type="tns:byte16"/>
+					<xsd:element name="QITMID"
+					             type="tns:byte16"/>
+					<xsd:element name="HOLD_INCLUDE_INF"
+					             type="tns:char1"/>
+					<xsd:element name="WDATU"
+					             type="tns:decimal15.0"/>
+					<xsd:element name="VFDAT"
+					             type="tns:date10"/>
+					<xsd:element name="COO"
+					             type="tns:char3"/>
+					<xsd:element name="BRESTR"
+					             type="tns:char1"/>
+					<xsd:element name="EXCCODE"
+					             type="tns:char4"/>
+					<xsd:element name="IPRCODE"
+					             type="tns:char4"/>
+					<xsd:element name="HU_PMAT"
+					             type="tns:char40"/>
+					<xsd:element name="HU_TYPE"
+					             type="tns:char4"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-HU_BIZ">
+				<xsd:sequence>
+					<xsd:element name="SSCC"
+					             type="tns:numeric18"/>
+					<xsd:element name="LGNUM_HU"
+					             type="tns:char4"/>
+					<xsd:element name="HUIDENT"
+					             type="tns:char20"/>
+					<xsd:element name="VHI"
+					             type="tns:char1"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-LOC_BIZ">
+				<xsd:sequence>
+					<xsd:element name="WERKS"
+					             type="tns:char4"/>
+					<xsd:element name="LGORT"
+					             type="tns:char4"/>
+					<xsd:element name="GLN"
+					             type="tns:numeric13"/>
+					<xsd:element name="DUNS4"
+					             type="tns:numeric13"/>
+					<xsd:element name="LOCID"
+					             type="tns:byte16"/>
+					<xsd:element name="APO_LOCNO"
+					             type="tns:char20"/>
+					<xsd:element name="PARTNER"
+					             type="tns:char10"/>
+					<xsd:element name="PARTNER_ROLE"
+					             type="tns:char2"/>
+					<xsd:element name="MOTID"
+					             type="tns:char35"/>
+					<xsd:element name="MOTSCODE"
+					             type="tns:char4"/>
+					<xsd:element name="LGNUM"
+					             type="tns:char4"/>
+					<xsd:element name="LGTYP"
+					             type="tns:char4"/>
+					<xsd:element name="LGPLA"
+					             type="tns:char18"/>
+					<xsd:element name="RSRC"
+					             type="tns:char18"/>
+					<xsd:element name="TU_NUM"
+					             type="tns:char18"/>
+					<xsd:element name="LGNUM_VIEW"
+					             type="tns:char1"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-STOCK_BIZ">
+				<xsd:sequence>
+					<xsd:element name="MATNR"
+					             type="tns:char40"/>
+					<xsd:element name="CHARG"
+					             type="tns:char10"/>
+					<xsd:element name="OWNER"
+					             type="tns:char10"/>
+					<xsd:element name="OWNER_ROLE"
+					             type="tns:char2"/>
+					<xsd:element name="GTIN"
+					             type="tns:numeric14"/>
+					<xsd:element name="GTIN_VARIANT"
+					             type="tns:numeric2"/>
+					<xsd:element name="CAT"
+					             type="tns:char2"/>
+					<xsd:element name="STOCK_USAGE"
+					             type="tns:char1"/>
+					<xsd:element name="SALES_ORD_STOCK"
+					             type="tns:char10"/>
+					<xsd:element name="S_ORD_ITEM_STOCK"
+					             type="tns:numeric6"/>
+					<xsd:element name="WBS_STOCK"
+					             type="tns:char24"/>
+					<xsd:element name="VRSIOID"
+					             type="tns:byte16"/>
+					<xsd:element name="PRDID"
+					             type="tns:byte16"/>
+					<xsd:element name="APO_MATNR"
+					             type="tns:char40"/>
+					<xsd:element name="LGNUM_STOCK"
+					             type="tns:char4"/>
+					<xsd:element name="MATID"
+					             type="tns:byte16"/>
+					<xsd:element name="BATCHID"
+					             type="tns:byte16"/>
+					<xsd:element name="STOCK_DOCCAT"
+					             type="tns:char3"/>
+					<xsd:element name="STOCK_DOCNO"
+					             type="tns:char35"/>
+					<xsd:element name="STOCK_ITMNO"
+					             type="tns:numeric10"/>
+					<xsd:element name="DOCCAT"
+					             type="tns:char3"/>
+					<xsd:element name="ENTITLED"
+					             type="tns:char10"/>
+					<xsd:element name="ENTITLED_ROLE"
+					             type="tns:char2"/>
+					<xsd:element name="STOCK_CNT"
+					             type="tns:numeric6"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_USID_BIZ">
+				<xsd:sequence>
+					<xsd:element name="SER_STATUS"
+					             type="tns:char1"/>
+					<xsd:element name="IDX_USID"
+					             type="tns:char3"/>
+					<xsd:element name="GUID_USID"
+					             type="tns:byte16"/>
+					<xsd:element name="SERNR"
+					             type="tns:char30"/>
+					<xsd:element name="UII"
+					             type="tns:char72"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PARAM">
+				<xsd:sequence>
+					<xsd:element name="PARAM_NAME"
+					             type="tns:char61"/>
+					<xsd:element name="PARAM_VALUE"
+					             type="tns:char255"/>
+					<xsd:element name="PARAM_GROUP"
+					             type="tns:char4"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_S_LOGHEAD">
+				<xsd:sequence>
+					<xsd:element name="MANDT"
+					             type="tns:clnt3"/>
+					<xsd:element name="GUID_DOC"
+					             type="tns:byte16"/>
+					<xsd:element name="IPO_YEAR"
+					             type="tns:numeric4"/>
+					<xsd:element name="IPO_NUMBER"
+					             type="tns:numeric20"/>
+					<xsd:element name="DOC_YEAR"
+					             type="tns:numeric4"/>
+					<xsd:element name="DOC_NUMBER"
+					             type="tns:numeric20"/>
+					<xsd:element name="PROCESS_TYPE"
+					             type="tns:char4"/>
+					<xsd:element name="LGNUM"
+					             type="tns:char4"/>
+					<xsd:element name="_DATAAGING"
+					             type="tns:date10"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_ITEM_POS">
+				<xsd:sequence>
+					<xsd:element name="IDX"
+					             type="xsd:int"/>
+					<xsd:element name="GUID_DOC"
+					             type="tns:byte16"/>
+					<xsd:element name="DOC_NUMBER"
+					             type="tns:numeric20"/>
+					<xsd:element name="DOC_YEAR"
+					             type="tns:numeric4"/>
+					<xsd:element name="IPO_NUMBER"
+					             type="tns:numeric20"/>
+					<xsd:element name="IPO_YEAR"
+					             type="tns:numeric4"/>
+					<xsd:element name="PROCESS_TYPE"
+					             type="tns:char4"/>
+					<xsd:element name="LGNUM"
+					             type="tns:char4"/>
+					<xsd:element name="ITEM_NO"
+					             type="tns:numeric6"/>
+					<xsd:element name="LINE_IDX"
+					             type="xsd:int"/>
+					<xsd:element name="CHANGE_SEQ"
+					             type="xsd:int"/>
+					<xsd:element name="ITEM_TYPE"
+					             type="tns:char2"/>
+					<xsd:element name="ITEM_GROUP"
+					             type="tns:numeric6"/>
+					<xsd:element name="LVL"
+					             type="xsd:int"/>
+					<xsd:element name="DOC_TYPE"
+					             type="tns:char2"/>
+					<xsd:element name="DOC_STATUS"
+					             type="tns:char4"/>
+					<xsd:element name="COUNT_DATE"
+					             type="tns:decimal21.7"/>
+					<xsd:element name="COUNT_USER"
+					             type="tns:char12"/>
+					<xsd:element name="CREATE_DATE"
+					             type="tns:decimal21.7"/>
+					<xsd:element name="POST_DATE"
+					             type="tns:decimal21.7"/>
+					<xsd:element name="DIF_DIRECTION"
+					             type="tns:char1"/>
+					<xsd:element name="POST_ITEM"
+					             type="tns:char1"/>
+					<xsd:element name="GUID_ITEM"
+					             type="tns:byte16"/>
+					<xsd:element name="TYPE_ITEM"
+					             type="tns:char1"/>
+					<xsd:element name="IDX_ITEM"
+					             type="tns:char3"/>
+					<xsd:element name="GUID_PARENT"
+					             type="tns:byte16"/>
+					<xsd:element name="TYPE_PARENT"
+					             type="tns:char1"/>
+					<xsd:element name="IDX_PARENT"
+					             type="tns:char3"/>
+					<xsd:element name="STOCK_ITEM"
+					             type="tns:_-LIME_-STOCK_BIZ"/>
+					<xsd:element name="HU_ITEM"
+					             type="tns:_-LIME_-HU_BIZ"/>
+					<xsd:element name="LOC_ITEM"
+					             type="tns:_-LIME_-LOC_BIZ"/>
+					<xsd:element name="LOC_PARENT"
+					             type="tns:_-LIME_-LOC_BIZ"/>
+					<xsd:element name="HU_PARENT"
+					             type="tns:_-LIME_-HU_BIZ"/>
+					<xsd:element name="PI_AREA"
+					             type="tns:byte16"/>
+					<xsd:element name="BLOCK_IND"
+					             type="tns:char1"/>
+					<xsd:element name="FREEZE_IND"
+					             type="tns:char1"/>
+					<xsd:element name="TIME_BOOK_QUAN_D"
+					             type="tns:decimal21.7"/>
+					<xsd:element name="VSI_ITEM"
+					             type="tns:char1"/>
+					<xsd:element name="PRIORITY"
+					             type="tns:numeric1"/>
+					<xsd:element name="ITEM_NEW_IND"
+					             type="tns:char1"/>
+					<xsd:element name="IND_PRINTED"
+					             type="tns:char1"/>
+					<xsd:element name="ORDER_SEQ"
+					             type="xsd:float"/>
+					<xsd:element name="LINE_GUID"
+					             type="tns:byte16"/>
+					<xsd:element name="IND_HU_ITEM_COMP"
+					             type="tns:char1"/>
+					<xsd:element name="IND_LOC_PAR_COMP"
+					             type="tns:char1"/>
+					<xsd:element name="IND_LOC_PAR_EMPT"
+					             type="tns:char1"/>
+					<xsd:element name="IND_HU_ITEM_EMPT"
+					             type="tns:char1"/>
+					<xsd:element name="IND_HU_ITEM_NOEX"
+					             type="tns:char1"/>
+					<xsd:element name="IND_ITEM_CHECKED"
+					             type="tns:char1"/>
+					<xsd:element name="IND_ADD_IT_CHECK"
+					             type="tns:char1"/>
+					<xsd:element name="REASON"
+					             type="tns:char4"/>
+					<xsd:element name="HOLD_INCLUDE"
+					             type="tns:char1"/>
+					<xsd:element name="INSPTYP"
+					             type="tns:char1"/>
+					<xsd:element name="INSPID"
+					             type="tns:byte16"/>
+					<xsd:element name="IDPLATE"
+					             type="tns:char20"/>
+					<xsd:element name="QDOCCAT"
+					             type="tns:char3"/>
+					<xsd:element name="QDOCID"
+					             type="tns:byte16"/>
+					<xsd:element name="QITMID"
+					             type="tns:byte16"/>
+					<xsd:element name="HOLD_INCLUDE_INF"
+					             type="tns:char1"/>
+					<xsd:element name="WDATU"
+					             type="tns:decimal15.0"/>
+					<xsd:element name="VFDAT"
+					             type="tns:date10"/>
+					<xsd:element name="COO"
+					             type="tns:char3"/>
+					<xsd:element name="BRESTR"
+					             type="tns:char1"/>
+					<xsd:element name="EXCCODE"
+					             type="tns:char4"/>
+					<xsd:element name="IPRCODE"
+					             type="tns:char4"/>
+					<xsd:element name="HU_PMAT"
+					             type="tns:char40"/>
+					<xsd:element name="HU_TYPE"
+					             type="tns:char4"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_DOC_LOGITEM">
+				<xsd:sequence>
+					<xsd:element name="LOG_TYPE"
+					             type="tns:char6"/>
+					<xsd:element name="LOG_SEQ"
+					             type="xsd:int"/>
+					<xsd:element name="TIMESTAMP"
+					             type="tns:decimal21.7"/>
+					<xsd:element name="USERID"
+					             type="tns:char12"/>
+					<xsd:element name="PROCESS_TYPE"
+					             type="tns:char4"/>
+					<xsd:element name="REF_DOC_ID"
+					             type="tns:char70"/>
+					<xsd:element name="REF_DOC_TYPE"
+					             type="tns:char10"/>
+					<xsd:element name="REF_DOC_LOGSYS"
+					             type="tns:char10"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_T_GUID_ITEM">
+				<xsd:sequence>
+					<xsd:element name="item"
+					             type="tns:_-LIME_-PI_S_GUID_ITEM"
+					             minOccurs="0"
+					             maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_T_ITEM_READ">
+				<xsd:sequence>
+					<xsd:element name="item"
+					             type="tns:_-LIME_-PI_ITEM_READ"
+					             minOccurs="0"
+					             maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="BAPIRET2_T">
+				<xsd:sequence>
+					<xsd:element name="item"
+					             type="tns:BAPIRET2"
+					             minOccurs="0"
+					             maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_T_ITEM_READ_GETSINGLE">
+				<xsd:sequence>
+					<xsd:element name="item"
+					             type="tns:_-LIME_-PI_ITEM_READ_GET_SINGLE"
+					             minOccurs="0"
+					             maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_T_ITEM_SUB_READ_GET_S">
+				<xsd:sequence>
+					<xsd:element name="item"
+					             type="tns:_-LIME_-PI_ITEM_SUB_READ_GET_SIN"
+					             minOccurs="0"
+					             maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_T_QUAN">
+				<xsd:sequence>
+					<xsd:element name="item"
+					             type="tns:_-LIME_-PI_QUAN"
+					             minOccurs="0"
+					             maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_T_USID_BIZ">
+				<xsd:sequence>
+					<xsd:element name="item"
+					             type="tns:_-LIME_-PI_USID_BIZ"
+					             minOccurs="0"
+					             maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-T_PARAM">
+				<xsd:sequence>
+					<xsd:element name="item"
+					             type="tns:_-LIME_-PARAM"
+					             minOccurs="0"
+					             maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="_-LIME_-PI_T_DOC_LOGITEM">
+				<xsd:sequence>
+					<xsd:element name="item"
+					             type="tns:_-LIME_-PI_DOC_LOGITEM"
+					             minOccurs="0"
+					             maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="ZFSCWM_PI_CALL_DOCUMENT_READ_S">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="IS_HEAD"
+						             type="tns:_-LIME_-PI_HEAD_ATTRIBUTES"/>
+						<xsd:element name="IT_GUID_DOC"
+						             type="tns:_-LIME_-PI_T_GUID_ITEM"
+						             minOccurs="0"/>
+						<xsd:element name="IT_ITEM"
+						             type="tns:_-LIME_-PI_T_ITEM_READ"
+						             minOccurs="0"/>
+						<xsd:element name="IV_ACTUAL_BOOK_QUAN"
+						             type="tns:char1"
+						             minOccurs="0"/>
+						<xsd:element name="IV_COUNT_TIME"
+						             type="tns:decimal21.7"
+						             minOccurs="0"/>
+						<xsd:element name="IV_ENQUEUE"
+						             type="tns:char1"
+						             minOccurs="0"/>
+						<xsd:element name="IV_IT_HEAD_O"
+						             type="tns:char1"
+						             minOccurs="0"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="ZFSCWM_PI_CALL_DOCUMENT_READ_SResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="ET_BAPIRET"
+						             type="tns:BAPIRET2_T"/>
+						<xsd:element name="ET_ITEM_READ"
+						             type="tns:_-LIME_-PI_T_ITEM_READ_GETSINGLE"/>
+						<xsd:element name="E_RC_SEVERITY"
+						             type="tns:char1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="ZFSCWM_PI_CALL_DOCUMENT_READ_S">
+		<wsdl:part name="parameters"
+		           element="tns:ZFSCWM_PI_CALL_DOCUMENT_READ_S"/>
+	</wsdl:message>
+	<wsdl:message name="ZFSCWM_PI_CALL_DOCUMENT_READ_SResponse">
+		<wsdl:part name="parameter"
+		           element="tns:ZFSCWM_PI_CALL_DOCUMENT_READ_SResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="ZFSCWM_PI_CALL_DOCUMENT_READ_S">
+		<wsdl:operation name="ZFSCWM_PI_CALL_DOCUMENT_READ_S">
+			<wsdl:input message="tns:ZFSCWM_PI_CALL_DOCUMENT_READ_S"/>
+			<wsdl:output message="tns:ZFSCWM_PI_CALL_DOCUMENT_READ_SResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="binding"
+	              type="tns:ZFSCWM_PI_CALL_DOCUMENT_READ_S">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+		              style="document"/>
+		<wsdl:operation name="ZFSCWM_PI_CALL_DOCUMENT_READ_S">
+			<soap:operation soapAction="urn:sap-com:document:sap:rfc:functions:ZFSCWM_PI_CALL_DOCUMENT_READ_S:ZFSCWM_PI_CALL_DOCUMENT_READ_SRequest"
+			                style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="service">
+		<wsdl:port name="binding"
+		           binding="tns:binding">
+			<soap:address location="http://vhdexhedci.hec.duratex.com.br:8000/sap/bc/srt/scs/sap/zfscwm_pi_call_document_read_s?sap-client=210"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
