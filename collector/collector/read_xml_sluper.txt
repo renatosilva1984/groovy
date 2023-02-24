@@ -1,0 +1,57 @@
+/* Refer the link below to learn more about the use cases of script.
+https://help.sap.com/viewer/368c481cd6954bdfa5d0435479fd4eaf/Cloud/en-US/148851bf8192412cba1f9d2c17f4bd25.html
+
+If you want to know more about the SCRIPT APIs, refer the link below
+https://help.sap.com/doc/a56f52e1a58e4e2bac7f7adbf45b2e26/Cloud/en-US/index.html */
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.xml.XmlUtil;
+import groovy.xml.*;
+import groovy.json.JsonSlurper;
+
+def Message processData(Message message){
+    def lv_valid = 'update';
+    def properties = message.getProperties();
+    def lv_body = properties.get("OriginalBody");
+    def lv_material = properties.get("Material");
+    def lo_root = new XmlSlurper().parseText(lv_body);
+    def ls_idoc = lo_root.'**'.find{ it.name() == 'IDOC'};
+    def ls_e1maram = ls_idoc.'**'.find{ it.name() == 'E1MARAM'};
+    def lt_e1maktm = ls_e1maram.'**'.findAll{ it.name() == 'E1MAKTM'};
+    def ls_e1maktm = null;
+    def lv_entry = '';
+    
+    try {
+         def ls_response = new JsonSlurper().parseText(message.getBody(java.lang.String));
+    } catch(Exception ex) {
+         lv_valid = 'create';
+    };
+    
+    for(int i = 0; i < lt_e1maktm.size(); i++){
+        if(lt_e1maktm[i].SPRAS == 'P'){
+            ls_e1maktm = lt_e1maktm[i];    
+        }
+    }
+    
+    if(ls_e1maktm == null){
+        ls_e1maktm = lt_e1maktm[0];
+    };
+    
+    def lv_mat_desc = lv_material.replaceFirst("^0*", "") + ' ' + ls_e1maktm.MAKTX;
+    
+    lv_entry = Field(lv_material, "productId");
+    lv_entry = lv_entry + Field(lv_mat_desc, "productName");
+    lv_entry = lv_entry + Field(ls_e1maktm.MAKTX, "description");
+    lv_entry = '{' + lv_entry + '\n' + '}';
+    
+    message.setProperty("Payload", lv_entry);
+    message.setProperty("operation", lv_valid);
+    message.setBody(lv_entry);
+    return message;
+}
+
+def Field(value, label){
+    def r = '';
+    r = '\n' + '"' + label + '"' + ':' + '"' + value + '"' + ',';
+    return r;
+}

@@ -1,0 +1,18 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.json.*;
+
+def Message processData(Message message){       
+
+   def body = message.getBody(String) 
+   def jsonParser = new JsonSlurper()
+   def jsonObject = jsonParser.parseText(body)
+   
+   def properties = message.getProperties()
+   def CamelSplitIndex = properties.get("CamelSplitIndex").toInteger()   
+   def arrayReturnTotal = properties.get("arrayReturnTotal").toList()
+   arrayReturnTotal[CamelSplitIndex] = jsonObject.BAPI_PO_CREATE1Response.RETURN.item
+   message.setProperty("arrayReturnTotal", arrayReturnTotal)
+
+   return message;
+}

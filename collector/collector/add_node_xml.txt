@@ -1,0 +1,142 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.xml.*;
+
+def Message processData(Message message) {
+    
+    def String numPedido = "";
+    def String numCarga = "";
+    def String numNF = "";
+    def String numRemessa = "";
+    def String numOF = "";
+    def String net_amount = "";
+    def String vCurrency = "";
+    def xml = new XmlParser().parseText(message.getBody(String));
+
+    def it = xml.ZCDS_MULTISOFTWAREType.iterator();
+
+    def String mPedido  = xml.ZCDS_MULTISOFTWAREType[0].ZZ1_MULTI_PEDIDO_DLH.text();
+    def String mCarga   = xml.ZCDS_MULTISOFTWAREType[0].ZZ1_MULTI_CARGA_DLH.text();
+    def String mPedido2 = xml.ZCDS_MULTISOFTWAREType[0].cd_protocolo_ped.text();
+    def String mCarga2  = xml.ZCDS_MULTISOFTWAREType[0].cd_protocolo_carga.text();
+    def String MultiEndpoint = "";
+    def String vToken = "";
+    def String TokenRC = message.getProperty("TokenRC");
+    def String EndpointRC = message.getProperty("EndpointRC");
+    def String TokenDeca = message.getProperty("TokenDeca");
+    def String EndpointDeca = message.getProperty("EndpointDeca");
+
+    //monta primeiro item do XML de saída para agrupar por carga
+    multiPedido = "<multiPedido><item>";
+    if(mPedido != ''){
+        multiPedido = multiPedido + "<ZZ1_MULTI_PEDIDO_DLH>" + mPedido + "</ZZ1_MULTI_PEDIDO_DLH>";
+    }else{
+        multiPedido = multiPedido + "<ZZ1_MULTI_PEDIDO_DLH>" + mPedido2 + "</ZZ1_MULTI_PEDIDO_DLH>";
+    }
+    
+    if(mCarga != '' && mCarga2 == ''){
+        multiPedido = multiPedido + "<ZZ1_MULTI_CARGA_DLH>" + mCarga + "</ZZ1_MULTI_CARGA_DLH>";
+    }else{
+        multiPedido = multiPedido + "<ZZ1_MULTI_CARGA_DLH>" + mCarga2 + "</ZZ1_MULTI_CARGA_DLH>";
+    }
+    
+    multiPedido = multiPedido + "</item></multiPedido>";
+
+    // message.setProperty("Token", Token);
+    // message.setProperty("MultiEndpoint", MultiEndpoint);
+
+    def xmlMultiPedido = new XmlParser().parseText(multiPedido);
+    def it2 = xmlMultiPedido.item.iterator();
+    
+    def i = 0;
+    def j = 0;
+    def ult = 0;
+    def encontrou = false;
+
+    def nodeBuilder = new NodeBuilder();
+
+    //Percorre o xml vindo do body
+    for(i=0;i<xml.ZCDS_MULTISOFTWAREType.size();i++){
+        
+        
+        if(xml.ZCDS_MULTISOFTWAREType[i].ZZ1_MULTI_PEDIDO_DLH.text() != ''){
+            numPedido = xml.ZCDS_MULTISOFTWAREType[i].ZZ1_MULTI_PEDIDO_DLH.text();
+        }else{
+            numPedido = xml.ZCDS_MULTISOFTWAREType[i].cd_protocolo_ped.text();
+        }
+        
+        if(xml.ZCDS_MULTISOFTWAREType[i].ZZ1_MULTI_CARGA_DLH.text() != '' && xml.ZCDS_MULTISOFTWAREType[i].cd_protocolo_carga.text() == ''){
+            numCarga = xml.ZCDS_MULTISOFTWAREType[i].ZZ1_MULTI_CARGA_DLH.text();
+            MultiEndpoint = EndpointRC; // "https://rc.multihomo.com.br/SGT.WebService/NFe.svc";
+            vToken = TokenRC;
+            vType = "RC";
+            println(TokenRC)
+        }else{
+            numCarga = xml.ZCDS_MULTISOFTWAREType[i].cd_protocolo_carga.text();
+            MultiEndpoint = EndpointDeca; //"https://decamadeira.multihomo.com.br/SGT.WebService/NFe.svc";
+            vToken = TokenDeca;
+            vType = "DECA";
+            println(TokenDeca)
+        }
+        
+        numNF = xml.ZCDS_MULTISOFTWAREType[i].BR_NotaFiscal.text();
+        numRemessa = xml.ZCDS_MULTISOFTWAREType[i].PrecedingDocument.text();
+        numOF = xml.ZCDS_MULTISOFTWAREType[i].MeansOfTransport.text();
+        net_amount = xml.ZCDS_MULTISOFTWAREType[i].net_amount.text();
+        vCurrency = xml.ZCDS_MULTISOFTWAREType[i].Currency.text();
+        
+        //Percorre o XML de saída
+        for(j=0;j<xmlMultiPedido.item.size();j++){
+            //se existir insere o numero da nota
+            if(numCarga == xmlMultiPedido.item[j].ZZ1_MULTI_CARGA_DLH.text()){
+                encontrou = true;
+                def nfNode = nodeBuilder.notas{
+                    ZZ1_MULTI_PEDIDO_DLH ( numPedido );
+                    BR_NotaFiscal ( numNF );
+                    PrecedingDocument ( numRemessa );
+                    MeansOfTransport ( numOF );
+                    NetAmount ( net_amount );
+                    Currency ( vCurrency );
+                    Token ( vToken );
+                    Endpoint ( MultiEndpoint );
+                    Type ( vType );
+                }
+                xmlMultiPedido.item[j].append( nfNode );
+            }
+        }
+
+        //Se não existir adiciona um novo item com a nota correspondente
+        if(encontrou == false){
+            
+            def itemNode = nodeBuilder.item {
+	            ZZ1_MULTI_PEDIDO_DLH( numPedido );
+	            ZZ1_MULTI_CARGA_DLH( numCarga );
+                // BR_NotaFiscal( numNF );
+            }
+
+            xmlMultiPedido.append(itemNode);
+
+            nfNode = nodeBuilder.notas{
+                ZZ1_MULTI_PEDIDO_DLH ( numPedido );
+                BR_NotaFiscal ( numNF );
+                PrecedingDocument ( numRemessa );
+                MeansOfTransport ( numOF );
+                NetAmount ( net_amount );
+                Currency ( vCurrency );
+                Token ( vToken );
+                Endpoint ( MultiEndpoint );
+                Type ( vType );
+            }
+            ult = xmlMultiPedido.item.size() - 1;
+
+            xmlMultiPedido.item[ult].append( nfNode );
+        }
+        encontrou = false;
+    }
+
+    String outxml = groovy.xml.XmlUtil.serialize( xmlMultiPedido )
+
+    message.setBody(outxml);
+
+	return message ;
+}

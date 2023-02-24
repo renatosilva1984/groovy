@@ -1,0 +1,38 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.json.*;
+
+def Message processData(Message message){
+    
+    def headers = message.getHeaders()
+    
+    def CamelFileName = headers.get("CamelFileName")
+    
+    message.setProperty("FileNameReturn", CamelFileName.replace(".csv", ""))
+
+    def body = message.getBody(String)   
+   
+    ArrayList<String> lineParts = body.replace("\r\n", "\n").tokenize("\n")
+    
+    String keys = lineParts[0]
+    String values = lineParts[1]
+    
+    def properties = message.getProperties()
+    
+    String type = properties.get("arrayType")
+    String id = properties.get("arrayID")
+    String num = properties.get("arrayNUMBER")
+    String mensagem = properties.get("arrayMESSAGE")
+    
+    String newKeys = "TYPE;ID;NUM;MESSAGE"
+    String newValues = "$type;$id;$num;$mensagem"
+
+    String resKeys = "$keys;$newKeys"
+    String resValues = "$values;$newValues"
+
+    String result = "$resKeys\n$resValues"
+
+    message.setBody(result)
+    
+   return message;
+}

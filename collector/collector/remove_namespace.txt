@@ -1,0 +1,16 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+
+def Message addNamespace(Message message){
+	def messageBody = message.getBody(java.lang.String) as String;	
+	messageBody = messageBody.replaceAll("<ZFSCWM_BAPI_GOODSMVT_CREATE>", "<ns0:ZFSCWM_BAPI_GOODSMVT_CREATE xmlns:ns0=\"urn:sap-com:document:sap:rfc:functions\">");	
+	messageBody = messageBody.replaceAll("</ZFSCWM_BAPI_GOODSMVT_CREATE>", "</ns0:ZFSCWM_BAPI_GOODSMVT_CREATE>");	
+	message.setBody(messageBody);
+	return message;
+}
+
+def Message removeNamespace(Message message){
+    def messageBody = message.getBody(java.lang.String) as String;	
+    messageBody = messageBody.replaceAll("n0:", "");
+    message.setBody(messageBody);
+    return message;
+}

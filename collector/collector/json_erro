@@ -1,0 +1,12 @@
+{
+	"codigo_erro": "1e574573-3e12-4679-a208-acb1f39f6a37",
+	"mensagem": "Solicitação Imprópria",
+	"campos": [
+		{
+			"codigo_erro": "erro-1000",
+			"campo": "Parametro",
+			"mensagem": "Parametro enviado não preenchido.",
+			"valor": null
+		}
+	]
+}

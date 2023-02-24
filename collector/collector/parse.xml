@@ -1,0 +1,47 @@
+/* Refer the link below to learn more about the use cases of script.
+https://help.sap.com/viewer/368c481cd6954bdfa5d0435479fd4eaf/Cloud/en-US/148851bf8192412cba1f9d2c17f4bd25.html
+
+If you want to know more about the SCRIPT APIs, refer the link below
+https://help.sap.com/doc/a56f52e1a58e4e2bac7f7adbf45b2e26/Cloud/en-US/index.html */
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+def Message processData(Message message) {
+    
+    def String ErrorMessage = message.getProperty("ErrorMessage");
+    def String xmlEnvioAtual = message.getProperty("xmlEnvioAtual");
+    def xml = new XmlParser().parseText(xmlEnvioAtual);
+    // def xml2 = new XmlParser().parseText(message.getBody(String));
+    def String multiPedido = message.getProperty("Pedido");
+    def String multiCarga = message.getProperty("Carga");
+    def String xmlError = "<xmlReturn><Result>";
+    xmlError = xmlError + "<code>400</code>";
+    xmlError = xmlError + "<multiPedido>" + multiPedido + "</multiPedido>";
+    xmlError = xmlError + "<multiCarga>" + multiCarga + "</multiCarga>";
+    xmlError = xmlError + "<message>" + ErrorMessage + "</message>";
+    xmlError = xmlError + "</Result></xmlReturn>";
+    def xml2 = new XmlParser().parseText(xmlError);
+    
+    def nodeBuilder = new NodeBuilder();
+
+    for(def i = 0; i < xml.item.notas.size(); i++){
+
+        def numNF = xml.item.notas[i].BR_NotaFiscal.text();
+        def numRemessa = xml.item.notas[i].PrecedingDocument.text();
+        def numOF = xml.item.notas[i].MeansOfTransport.text();
+        
+        def nfNode = nodeBuilder.item{
+            BR_NotaFiscal ( numNF );
+            PrecedingDocument ( numRemessa );
+            MeansOfTransport ( numOF );
+        }
+        // xml2.IntegrarNotasFiscaisResult[0].append( nfNode );
+        xml2.Result[0].append( nfNode );
+    }
+
+    String outxml = groovy.xml.XmlUtil.serialize( xml2 );
+
+    // message.setBody(outxml);
+    message.setProperty("xmlError", outxml);
+
+	return message ;
+}

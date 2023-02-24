@@ -1,0 +1,125 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+
+import java.io.ByteArrayInputStream;
+import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.RSAPublicKeySpec;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+
+import org.apache.commons.codec.binary.Base64;
+import org.w3c.dom.Element;   
+
+public class AESRSA{
+
+	private static final String KeyPublicRSA = "PFJTQUtleVZhbHVlPjxNb2R1bHVzPnpza0Q3VC9iMUlyVlkwRSttVHRtUFlIclFtOENBdDFFZmVWcEN3UnYyMnRIVHVTc1hFQ0VnbEFQQTMyS21TV1BZb0VmRVNBSVQxWW41d0xWbXZ5c1QrRi9kN3BIWDlyYUJ5ckFPbVhzMHBiVThWMnJnWHVnQ0NSci92a1BkeWpWZVppK1paQ1JqOG5pRXBCcThETjJtNUlSekNOK3lmRit0OEg0NmE2ejB3MD08L01vZHVsdXM+PEV4cG9uZW50PkFRQUI8L0V4cG9uZW50PjwvUlNBS2V5VmFsdWU+";
+	private static String KeyPrivateAES = "S/UFjc1ftDFK5+77U1PB80v2GacokGap5yCIP2YI6tQ=";
+	private static String IVPrivate = "miPr4lohZEwFeSFkowlHcg==";
+	private static SecretKeySpec secretKey;
+	private static String separator = "sQia4";
+	private static String myPayloadBody = "{\"codigoEmpregador\":\"1\",\"Lista\":[ {\"Cpf\":\"30977672842\",\"Matricula\":\"350239541\",\"Empregador\":\"123231212\",\"Nome\":\"Phillip Tessuto\",\"DataNascimento\":\"2020-07-07T20:09:47.422Z\",\"EmailPrincipal\":\"phillip.certsys@duratex.com.br\",\"MatriculaAlfanumerico\":\"123231212121\",\"Sexo\":\"Masculino\",\"RG\":\"350239541\",\"EmailSecundario\":\"phillip.certsys@duratex.com.br\",\"TelefoneResidencial\":\"1132070916\",\"TelefoneComercial\":\"1132070916\",\"Cep\":\"041003001\",\"Endereco\":\"Rua do Paraíso\",\"Bairro\":\"Paraíso\",\"Cidade\":\"São Paulo\",\"Estado\":\"SP\",\"Salario\":\"1\",\"Numero\":\"617\",\"Complemento\":\"Residência\",\"TelefoneCelular\":\"11998792763\",\"Naturalidade\":\"Brasileiro\",\"OrgaoExpedidor\":\"SSP\",\"UFExpedidor\":\"SP\",\"DataExpedicao\":\"2020-07-07T20:09:47.422Z\",\"NomeMae\":\"Maria Araújo\",\"NomePai\":\"Edgard Tessuto\",\"EstadoCivil\":\"0\",\"NomeConjuge\":\"Ninguém\" }]}";
+	private static String myParamPath = "01/2022/01";
+
+    public static RSAPublicKeySpec getPublicKey(String KeyPublicRSAProperty) throws Exception{    	
+        byte[] decoded = Base64.decodeBase64(KeyPublicRSAProperty);
+	    String publicKey = new String(decoded, "UTF-8");
+	    DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	    Element el = db.parse(new ByteArrayInputStream (publicKey.getBytes())).getDocumentElement();
+	    		    	    
+        byte[] modulusBytes = Base64.decodeBase64(el.getElementsByTagName("Modulus").item(0).getTextContent());
+        byte[] exponentBytes = Base64.decodeBase64(el.getElementsByTagName("Exponent").item(0).getTextContent());
+
+        BigInteger modulus = new BigInteger(1, (modulusBytes) );
+        BigInteger exponent = new BigInteger(1, (exponentBytes));
+        
+        return new RSAPublicKeySpec(modulus, exponent);
+    }
+
+    public static String encryptRSA(RSAPublicKeySpec rsaPublicKeySpec, String parametros, String KeyPublicRSAProperty) throws Exception{
+    	RSAPublicKeySpec spec = getPublicKey(KeyPublicRSAProperty);
+    	KeyFactory kf = KeyFactory.getInstance("RSA");
+    	PublicKey publicKey = kf.generatePublic(spec);
+    	Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); 
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        
+    	int keyLength = rsaPublicKeySpec.getModulus().bitLength() / 16;
+    	String[] datas = parametros.split("(?<=\\G.{" + (keyLength - 11) + "})");
+    	byte[] encryptedData = null;
+    	for (String s : datas) {
+    		encryptedData = concatenateByteArrays(encryptedData, cipher.doFinal(s.getBytes("UTF-16LE")));
+    	}
+    	return Base64.encodeBase64String(arrayAsString(encryptedData).getBytes());
+    }
+        
+    public static void setKey(String aesKey) {
+		try {
+			byte[] key = Base64.decodeBase64(aesKey);
+			secretKey = new SecretKeySpec(key, "AES");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static String encryptAES(String strToEncrypt, String secret, String iv) {
+		try {
+			setKey(secret);
+			IvParameterSpec ivspec = new IvParameterSpec(Base64.decodeBase64(iv));
+			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivspec);
+			return Base64.encodeBase64String(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
+		} catch (Exception e) {
+			System.out.println("Error while encrypting: " + e.toString());
+		}
+		return null;
+	}	
+    
+    public static byte[] concatenateByteArrays(byte[] a, byte[] b) {
+    	if(a == null)
+    		return b;
+        byte[] result = new byte[a.length + b.length]; 
+        System.arraycopy(a, 0, result, 0, a.length); 
+        System.arraycopy(b, 0, result, a.length, b.length); 
+        return result;
+    }
+
+    public static String arrayAsString (byte [] array){
+        String p = "";
+        for (int i = 0; i < array.length; i++) {
+            p +=  unsignedToBytes(array[i]);
+            if (i < array.length - 1)
+                p+= ",";
+        }
+        return p;
+    }
+
+    public static int unsignedToBytes(byte b) {
+        return b & 0xFF;
+    }
+
+}
+
+def Message processData(Message message){
+
+        def properties = message.getProperties()
+        String KeyPublicRSAProperty = properties.get("KeyPublicRSAProperty")
+        // println KeyPublicRSAProperty == AESRSA.KeyPublicRSA
+        // println KeyPublicRSAProperty
+       
+        RSAPublicKeySpec rsaPublicKeySpec = AESRSA.getPublicKey(KeyPublicRSAProperty);
+        
+        String criptoPath = AESRSA.encryptRSA(rsaPublicKeySpec, AESRSA.myParamPath, KeyPublicRSAProperty);
+        String criptoBody = AESRSA.encryptRSA(rsaPublicKeySpec, AESRSA.KeyPrivateAES, KeyPublicRSAProperty) + AESRSA.separator + AESRSA.encryptAES(AESRSA.myPayloadBody, AESRSA.KeyPrivateAES, AESRSA.IVPrivate);
+        println("X-SINQIA-Request: " + criptoPath);
+        println("Body: " + criptoBody);
+
+       
+    
+    return message; 
+   }

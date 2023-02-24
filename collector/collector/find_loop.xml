@@ -1,0 +1,118 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.xml.*;
+import java.time.LocalDateTime;
+import groovy.time.TimeCategory;
+
+def Message processData(Message message) {
+    
+    def i = 0;
+    def filter = "";
+    def xml = new XmlParser().parseText(message.getBody(String));
+    def it = xml.ZZ1_CONSTANTEType.iterator();
+    it.each {
+        
+        if (it.NAME.text() == "MULTI_VSTEL"){
+            if (filter == ""){
+                filter = filter + "( ShippingPoint eq '" + it.LOW.text() + "'";
+            }else {
+                filter = filter + " or ShippingPoint eq '" + it.LOW.text() + "'";
+            }
+        }
+    }
+    if (filter != ""){
+        filter = filter + " )";
+    }
+    i = 0;
+    it = xml.ZZ1_CONSTANTEType.iterator();
+    it.each {
+        
+        if (it.NAME.text() == "MULTI_LFART"){
+            if(filter == ""){
+                filter = filter + "( DeliveryDocumentType eq '" + it.LOW.text() + "'";
+            }else {
+                if (i == 0){
+                    filter = filter + " and ( DeliveryDocumentType eq '" + it.LOW.text() + "'";
+                }else {
+                    filter = filter + " or DeliveryDocumentType eq '" + it.LOW.text() + "'";
+                }
+            }
+            i = i + 1;
+        }
+    }
+
+    if (filter != ""){
+        filter = filter + " )";
+    }
+    
+    i = 0;
+    
+    def dt = LocalDateTime.now();
+    def date = new  Date();
+    def yesterday = date - 10;
+    def String date2 = date.format("ddMMaaaa");
+
+    def String sDate = yesterday.format("yyyy-MM-dd") + "T00:00:00";
+    
+    it = xml.ZZ1_CONSTANTEType.iterator();
+    it.each {
+        
+        if (it.NAME.text() == "MULTI_FREQ"){
+            
+            if(filter == ""){
+                filter = filter + "CreationDate ge datetime'" + sDate + "'";
+            }else {
+                if (i == 0){
+                    
+                    String sHora = it.LOW.text();
+                    int iHora = sHora.toInteger() + 3;
+
+                    //Horas em milisegundos para subtrair da data atual
+                    final Long milliseconds = iHora * 60 * 60 * 1000; // milliseconds
+                    
+                    //Data final
+                    Date now = new Date();
+                    def actualDate = now.format("yyyy-MM-dd HH:MM:ss");
+                    Date actualDateTime = new Date(now.toInstant().toEpochMilli() - milliseconds);
+                    def formatDate = actualDateTime.format("yyyy-MM-dd HH:MM:ss");
+                    String exitDate = formatDate.substring(0,10) + "T" + formatDate.substring(11,19);
+                    
+                    filter = filter + " and ( CreationDate ge datetime'" + exitDate + "' )";
+                }
+            }
+            i = i + 1;
+        }
+    }
+    
+    //Filtro que verifica as etapas anteriores ao processo de envio do XML
+    if(filter != ''){
+        // filter = filter + " and ( ( ZZ1_MULTI_PEDIDO_DLH ne '' and ZZ1_MULTI_CARGA_DLH ne '' and ZZ1_MULTI_PEDIDO_DLH ne '0' and ZZ1_MULTI_CARGA_DLH ne '0') or ( cd_protocolo_ped ne '' and cd_protocolo_carga ne '' and ZZ1_MULTI_CARGA_DLH ne '' and cd_protocolo_ped ne '0' and cd_protocolo_carga ne '0' ) )";
+        filter = filter + " and ( ( ZZ1_MULTI_PEDIDO_DLH ne '' and ZZ1_MULTI_CARGA_DLH ne '' and ZZ1_MULTI_PEDIDO_DLH ne '0' and ZZ1_MULTI_CARGA_DLH ne '0') or ( cd_protocolo_ped ne '' and cd_protocolo_carga ne '' and cd_protocolo_ped ne '0' and cd_protocolo_carga ne '0' ) )";
+    }else{
+        // filter = "( ( ZZ1_MULTI_PEDIDO_DLH ne '' and ZZ1_MULTI_CARGA_DLH ne '' and ZZ1_MULTI_PEDIDO_DLH ne '0' and ZZ1_MULTI_CARGA_DLH ne '0' ) or ( cd_protocolo_ped ne '' and cd_protocolo_carga ne '' and ZZ1_MULTI_CARGA_DLH ne '' and cd_protocolo_ped ne '0' and cd_protocolo_carga ne '0' ) )";
+        filter = "( ( ZZ1_MULTI_PEDIDO_DLH ne '' and ZZ1_MULTI_CARGA_DLH ne '' and ZZ1_MULTI_PEDIDO_DLH ne '0' and ZZ1_MULTI_CARGA_DLH ne '0' ) or ( cd_protocolo_ped ne '' and cd_protocolo_carga ne '' and cd_protocolo_ped ne '0' and cd_protocolo_carga ne '0' ) )";
+    }
+    
+    def headers = message.getHeaders();
+    // def NotaFiscal = headers.get("NotaFiscal");
+    // if(NotaFiscal != "" && NotaFiscal != null){
+    //     filter = "BR_NotaFiscal eq '"  + NotaFiscal +  "'";
+    // }
+    
+    def ProtocoloCarga = headers.get("ProtocoloCarga");
+    if(ProtocoloCarga != "" && ProtocoloCarga != null){
+        filter = "( ZZ1_MULTI_CARGA_DLH eq '"  + ProtocoloCarga +  "' or cd_protocolo_carga eq '" + ProtocoloCarga + "' )";
+    }
+    
+    def ProtocoloCarga2 = message.getProperty("ProtocoloCarga");
+    if(ProtocoloCarga2 != "" && ProtocoloCarga2 != null){
+        filter = "( ZZ1_MULTI_CARGA_DLH eq '"  + ProtocoloCarga2 +  "' or cd_protocolo_carga eq '" + ProtocoloCarga2 + "' )";
+    }
+    
+    //Filtro para não enviar novamente os XMLs
+    filter = filter + "and ( ZZ1_MULTI_NF_DLH eq '' )";
+      
+    message.setProperty("cds_msoftware_filter", filter);
+   
+    return message;
+}

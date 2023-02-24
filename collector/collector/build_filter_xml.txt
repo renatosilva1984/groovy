@@ -1,0 +1,33 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.xml.*;
+
+def Message processData(Message message) {
+    
+    message.setProperty("xmlEnvioAtual", message.getBody(String));
+    def String filter = "";
+    def xml = new XmlParser().parseText(message.getBody(String));
+    
+    //percorre as notas para montar o filtro
+    for(def i=0;i< xml.item.notas.size();i++){
+        if (filter == ""){
+            filter = "( Docnum eq '" + xml.item.notas[i].BR_NotaFiscal.text() + "'";
+        }else {
+            filter = filter + " or Docnum eq '" + xml.item.notas[i].BR_NotaFiscal.text() + "'";
+        }
+    }
+
+    if (filter != ""){
+        filter = filter + " )";
+    }
+
+    message.setProperty("download_xml_nfe_filter", filter);
+
+    def pedido = xml.item.ZZ1_MULTI_PEDIDO_DLH.text();
+    def carga = xml.item.ZZ1_MULTI_CARGA_DLH.text();
+    message.setProperty("Pedido", pedido);
+    message.setProperty("Carga", carga);
+
+
+	return message ;
+}

@@ -1,0 +1,186 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.json.*;
+
+def ArrayList guaranteeArray(input){
+    if(input.getClass() != java.util.ArrayList) return [input]
+
+    return input
+}
+
+def Message processData(Message message){
+
+    def body = message.getBody(String)
+    def jsonParser = new JsonSlurper()
+    def jsonObject = jsonParser.parseText(body)
+
+    def jsonPOACCOUNT
+    def jsonPOACCOUNTX
+    def jsonPOHEADER
+    def jsonPOHEADERX
+    def jsonPOITEM
+    def jsonPOITEMX
+    def jsonPOSERVICES1
+    def jsonPOSERVICES2
+    def jsonPOSRVACCESSVALUES
+    def jsonRETURN
+    def mapTOTAL
+    def builder = new JsonBuilder()
+    def jsonTOTAL
+
+    def arrayPOACCOUNT = []
+    def arrayPOACCOUNTX = []   
+    def arrayPOSERVICES = [] 
+    def arrayPOSRVACCESSVALUES = []
+
+    jsonObject.groups.row = guaranteeArray(jsonObject.groups.row)    
+
+    arrayPOACCOUNT = jsonObject.groups.row.collect{e ->
+        jsonPOACCOUNT = JsonOutput.toJson(            
+            "PO_ITEM": e.PO_ITEM3,
+            "SERIAL_NO": e.SERIAL_NO1,
+            "QUANTITY": e.QUANTITY2,
+            "NET_VALUE": e.NET_VALUE1,
+            "GL_ACCOUNT": e.GL_ACCOUNT1,
+            "COSTCENTER": e.COSTCENTER1
+        )        
+    }
+
+    arrayPOACCOUNTX = jsonObject.groups.row.collect{e ->
+        jsonPOACCOUNTX = JsonOutput.toJson(                
+            "PO_ITEM": e.PO_ITEM4,
+            "SERIAL_NO": e.SERIAL_NO,
+            "PO_ITEMX": e.PO_ITEMX2,
+            "SERIAL_NOX": e.SERIAL_NOX,
+            "GL_ACCOUNT": e.GL_ACCOUNT2,
+            "COSTCENTER": e.COSTCENTER2 
+        )
+    }
+
+    jsonPOHEADER = JsonOutput.toJson(
+        "COMP_CODE": jsonObject.groups.row[0].COMP_CODE1,
+        "DOC_TYPE": jsonObject.groups.row[0].DOC_TYPE1,
+        "VENDOR": jsonObject.groups.row[0].VENDOR1,
+        "PMNTTRMS": jsonObject.groups.row[0].PMNTTRMS1,
+        "PURCH_ORG": jsonObject.groups.row[0].PURCH_ORG1,
+        "PUR_GROUP": jsonObject.groups.row[0].PUR_GROUP1,
+        "CURRENCY": jsonObject.groups.row[0].CURRENCY1,
+        "INCOTERMS1": jsonObject.groups.row[0].INCOTERMS1,
+        "INCOTERMS2": jsonObject.groups.row[0].INCOTERMS2,
+        "OUR_REF": jsonObject.groups.row[0].OUR_REF  
+        )
+
+    jsonPOHEADERX =  JsonOutput.toJson(
+        "PO_NUMBER": jsonObject.groups.row[0].PO_NUMBER,
+        "COMP_CODE": jsonObject.groups.row[0].COMP_CODE2,
+        "DOC_TYPE": jsonObject.groups.row[0].DOC_TYPE2,
+        "VENDOR": jsonObject.groups.row[0].VENDOR2,
+        "PMNTTRMS": jsonObject.groups.row[0].PMNTTRMS2,
+        "PURCH_ORG": jsonObject.groups.row[0].PURCH_ORG2,
+        "PUR_GROUP": jsonObject.groups.row[0].PUR_GROUP2,
+        "CURRENCY": jsonObject.groups.row[0].CURRENCY2,
+        "INCOTERMS1": jsonObject.groups.row[0].INCOTERMS3,
+        "INCOTERMS2": jsonObject.groups.row[0].INCOTERMS4
+    )   
+    
+    jsonPOITEM = JsonOutput.toJson(
+        "item" : jsonParser.parseText(JsonOutput.toJson(
+            "PO_ITEM": jsonObject.groups.row[0].PO_ITEM1,
+            "SHORT_TEXT": jsonObject.groups.row[0].SHORT_TEXT1,
+            "PLANT": jsonObject.groups.row[0].PLANT1,
+            "MATL_GROUP": jsonObject.groups.row[0].MATL_GROUP1,
+            "QUANTITY": jsonObject.groups.row[0].QUANTITY1,
+            "PO_UNIT": jsonObject.groups.row[0].PO_UNIT,
+            "NET_PRICE": jsonObject.groups.row[0].NET_PRICE,
+            "PRICE_UNIT": jsonObject.groups.row[0].PRICE_UNIT,
+            "TAX_CODE": jsonObject.groups.row[0].TAX_CODE,
+            "ITEM_CAT": jsonObject.groups.row[0].ITEM_CAT1,
+            "ACCTASSCAT": jsonObject.groups.row[0].ACCTASSCAT1,
+            "GR_IND": jsonObject.groups.row[0].GR_IND,
+            "GR_BASEDIV": jsonObject.groups.row[0].GR_BASEDIV,
+            "AGREEMENT": jsonObject.groups.row[0].AGREEMENT,
+            "AGMT_ITEM": jsonObject.groups.row[0].AGMT_ITEM,
+            "CONF_CTRL": jsonObject.groups.row[0].CONF_CTRL,
+            "PCKG_NO": jsonObject.groups.row[0].PCKG_NO1
+    )))
+
+    jsonPOITEMX = JsonOutput.toJson(
+        "item" : jsonParser.parseText(JsonOutput.toJson(
+            "PO_ITEM": jsonObject.groups.row[0].PO_ITEM2,
+            "PO_ITEMX": jsonObject.groups.row[0].PO_ITEMX1,
+            "SHORT_TEXT": jsonObject.groups.row[0].SHORT_TEXT2,
+            "PLANT": jsonObject.groups.row[0].PLANT2,
+            "MATL_GROUP": jsonObject.groups.row[0].MATL_GROUP2,
+            "ITEM_CAT": jsonObject.groups.row[0].ITEM_CAT2,
+            "ACCTASSCAT": jsonObject.groups.row[0].ACCTASSCAT2,
+            "PCKG_NO": jsonObject.groups.row[0].PCKG_NO2
+    )))
+   
+    jsonPOSERVICES1 = JsonOutput.toJson(        
+        "PCKG_NO": jsonObject.groups.row[0].PCKG_NO3,
+        "LINE_NO": jsonObject.groups.row[0].LINE_NO1,
+        "OUTL_LEVEL": jsonObject.groups.row[0].OUTL_LEVEL1,
+        "OUTL_IND": jsonObject.groups.row[0].OUTL_IND,
+        "SUBPCKG_NO": jsonObject.groups.row[0].SUBPCKG_NO,
+        "SERVICE": jsonObject.groups.row[0].SERVICE,
+        "NET_VALUE": jsonObject.groups.row[0].NET_VALUE
+    )
+
+    jsonPOSERVICES2 = JsonOutput.toJson(        
+        "PCKG_NO": jsonObject.groups.row[0].PCKG_NO4,
+        "LINE_NO": jsonObject.groups.row[0].LINE_NO2,
+        "EXT_LINE": jsonObject.groups.row[0].EXT_LINE,
+        "OUTL_LEVEL": jsonObject.groups.row[0].OUTL_LEVEL2,
+        "QUANTITY": jsonObject.groups.row[0].QUANTITY,
+        "BASE_UOM": jsonObject.groups.row[0].BASE_UOM,
+        "GR_PRICE": jsonObject.groups.row[0].GR_PRICE,
+        "SHORT_TEXT": jsonObject.groups.row[0].SHORT_TEXT3
+    )
+
+    arrayPOSERVICES.add(jsonPOSERVICES1)
+    arrayPOSERVICES.add(jsonPOSERVICES2)   
+
+    arrayPOSRVACCESSVALUES = jsonObject.groups.row.collect{e ->
+    jsonPOSRVACCESSVALUES = JsonOutput.toJson(        
+            "PCKG_NO": e.PCKG_NO5,
+            "LINE_NO": e.LINE_NO3,
+            "SERNO_LINE": e.SERNO_LINE,
+            "PERCENTAGE": e.PERCENTAGE,
+            "SERIAL_NO": e.SERIAL_NO2
+    )
+        println e
+    }
+    jsonRETURN = JsonOutput.toJson(
+        "item" : jsonParser.parseText(JsonOutput.toJson(
+            "TYPE": "X",
+            "ID": "1",
+            "NUMBER": "1",
+            "MESSAGE": "1"
+    )))
+
+    mapTOTAL = builder {
+        POACCOUNT { 
+            "item" jsonParser.parseText("$arrayPOACCOUNT") 
+        }
+        POACCOUNTX {
+            "item" jsonParser.parseText("$arrayPOACCOUNTX")  
+        } 
+        POHEADER jsonParser.parseText("$jsonPOHEADER")
+        POHEADERX jsonParser.parseText("$jsonPOHEADERX")
+        POITEM jsonParser.parseText("$jsonPOITEM")
+        POITEMX jsonParser.parseText("$jsonPOITEMX")
+        POSERVICES {
+            "item" jsonParser.parseText("$arrayPOSERVICES")
+        }
+        POSRVACCESSVALUES{
+            "item" jsonParser.parseText("$arrayPOSRVACCESSVALUES")
+        } 
+        RETURN jsonParser.parseText("$jsonRETURN")
+    }
+
+    jsonTOTAL = JsonOutput.toJson(mapTOTAL)
+
+    message.setBody(JsonOutput.prettyPrint(jsonTOTAL))
+  
+   return message;
+}
